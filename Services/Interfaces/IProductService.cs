@@ -5,6 +5,7 @@ namespace PosStore.Services.Interfaces
     public interface IProductService
     {
         Task<IEnumerable<ProductDto>> GetAllProductsAsync();
+        Task<PagedResult<ProductDto>> GetProductsAsync(PaginationParameters parameters);
         Task<ProductDto?> GetProductByIdAsync(int id);
         Task<ProductDto?> GetProductBySkuAsync(string sku);
         Task<ProductDto> CreateProductAsync(CreateProductDto createProductDto);

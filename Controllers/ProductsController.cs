@@ -16,17 +16,37 @@ namespace PosStore.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts()
+        public async Task<ActionResult<PagedResult<ProductDto>>> GetProducts([FromQuery] PaginationParameters parameters)
+        {
+            var result = await _productService.GetProductsAsync(parameters);
+            return Ok(result);
+        }
+
+        [HttpGet("all")]
+        public async Task<ActionResult<IEnumerable<ProductDto>>> GetAllProducts()
         {
             var products = await _productService.GetAllProductsAsync();
             return Ok(products);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<ProductDto>> GetProduct(int id)
+        {
+            var product = await _productService.GetProductByIdAsync(id);
+
+            if (product == null)
+            {
+                return NotFound($"Product with ID {id} not found.");
+            }
+
+            return Ok(product);
         }
 
         [HttpPost]
         public async Task<ActionResult<ProductDto>> CreateProduct(CreateProductDto dto)
         {
             var product = await _productService.CreateProductAsync(dto);
-            return CreatedAtAction(nameof(GetProducts), new { id = product.Id }, product);
+            return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
         }
     }
 }

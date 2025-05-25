@@ -6,6 +6,7 @@ using PosStore.Services.Service;
 using PosStore.Middleware;
 var builder = WebApplication.CreateBuilder(args);
 
+var swaggerSettings = builder.Configuration.GetSection("Swagger");
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -32,11 +33,18 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (!app.Environment.IsProduction() || builder.Configuration.GetValue<bool>("Swagger:Enabled"))
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+
+app.UseCors(x => x
+               .SetIsOriginAllowed(origin => true)
+               .AllowAnyMethod()
+               .AllowAnyHeader()
+               .AllowCredentials());
 
 app.UseHttpsRedirection();
 

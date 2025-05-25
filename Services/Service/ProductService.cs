@@ -28,6 +28,90 @@ namespace PosStore.Services.Service
             return _mapper.Map<IEnumerable<ProductDto>>(products);
         }
 
+        public async Task<PagedResult<ProductDto>> GetProductsAsync(PaginationParameters parameters)
+        {
+            var query = _context.Products.Where(p => p.IsActive);
+
+            // Apply search filter
+            if (!string.IsNullOrEmpty(parameters.SearchTerm))
+            {
+                query = query.Where(p =>
+                    p.Name.Contains(parameters.SearchTerm) ||
+                    p.SKU.Contains(parameters.SearchTerm) ||
+                    (p.Category != null && p.Category.Contains(parameters.SearchTerm)) ||
+                    (p.Brand != null && p.Brand.Contains(parameters.SearchTerm)));
+            }
+
+            // Apply category filter
+            if (!string.IsNullOrEmpty(parameters.Category))
+            {
+                query = query.Where(p => p.Category == parameters.Category);
+            }
+
+            // Apply sorting
+            if (!string.IsNullOrEmpty(parameters.SortBy))
+            {
+                switch (parameters.SortBy.ToLower())
+                {
+                    case "name":
+                        query = parameters.SortOrder?.ToLower() == "desc"
+                            ? query.OrderByDescending(p => p.Name)
+                            : query.OrderBy(p => p.Name);
+                        break;
+                    case "price":
+                        query = parameters.SortOrder?.ToLower() == "desc"
+                            ? query.OrderByDescending(p => p.Price)
+                            : query.OrderBy(p => p.Price);
+                        break;
+                    case "quantity":
+                        query = parameters.SortOrder?.ToLower() == "desc"
+                            ? query.OrderByDescending(p => p.Quantity)
+                            : query.OrderBy(p => p.Quantity);
+                        break;
+                    case "createddate":
+                        query = parameters.SortOrder?.ToLower() == "desc"
+                            ? query.OrderByDescending(p => p.CreatedDate)
+                            : query.OrderBy(p => p.CreatedDate);
+                        break;
+                    default:
+                        query = query.OrderBy(p => p.Name);
+                        break;
+                }
+            }
+            else
+            {
+                query = query.OrderBy(p => p.Name);
+            }
+
+            // Get total count
+            var totalCount = await query.CountAsync();
+
+            // Apply pagination
+            var products = await query
+                .Skip((parameters.Page - 1) * parameters.PageSize)
+                .Take(parameters.PageSize)
+                .ToListAsync();
+
+            var productDtos = _mapper.Map<IEnumerable<ProductDto>>(products);
+
+            // Calculate pagination info
+            var totalPages = (int)Math.Ceiling((double)totalCount / parameters.PageSize);
+
+            return new PagedResult<ProductDto>
+            {
+                Data = productDtos,
+                Pagination = new PaginationInfo
+                {
+                    CurrentPage = parameters.Page,
+                    PageSize = parameters.PageSize,
+                    TotalCount = totalCount,
+                    TotalPages = totalPages,
+                    HasPrevious = parameters.Page > 1,
+                    HasNext = parameters.Page < totalPages
+                }
+            };
+        }
+
         public async Task<ProductDto?> GetProductByIdAsync(int id)
         {
             var product = await _context.Products
