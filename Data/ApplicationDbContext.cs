@@ -16,6 +16,8 @@ namespace PosStore.Data
         public DbSet<Sale> Sales { get; set; }
         public DbSet<SaleItem> SaleItems { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Project> Projects { get; set; }
+        public DbSet<ProjectCategory> ProjectCategories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -64,6 +66,25 @@ namespace PosStore.Data
             {
                 entity.HasIndex(e => e.Username).IsUnique();
                 entity.HasIndex(e => e.Email).IsUnique();
+                entity.Property(e => e.FullName).HasComputedColumnSql("concat([FirstName],' ',[LastName])", stored: true);
+                entity.Property(e => e.Initials).HasComputedColumnSql("concat(left([FirstName],(1)),left([LastName],(1)))", stored: true);
+            });
+
+            // Project configuration
+            modelBuilder.Entity<Project>(entity =>
+            {
+                entity.Property(e => e.Budget).HasPrecision(15, 2);
+                entity.Property(e => e.ActualCost).HasPrecision(15, 2);
+
+                entity.HasOne(e => e.Category)
+                    .WithMany(c => c.Projects)
+                    .HasForeignKey(e => e.CategoryId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.CreatedByUser)
+                    .WithMany()
+                    .HasForeignKey(e => e.CreatedBy)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
 
             // Seed data based on productlistdata.js
@@ -165,7 +186,9 @@ namespace PosStore.Data
                     FirstName = "System",
                     LastName = "Administrator",
                     Role = "Admin",
-                    CreatedDate = DateTime.UtcNow
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
                 }
             );
         }

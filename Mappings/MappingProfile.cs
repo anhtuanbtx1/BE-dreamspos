@@ -43,6 +43,19 @@ namespace PosStore.Mappings
             CreateMap<CreateSaleItemDto, SaleItem>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.SaleId, opt => opt.Ignore());
+
+            // Project mappings
+            CreateMap<Project, ProjectDto>()
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category != null ? src.Category.Name : null))
+                .ForMember(dest => dest.CreatedByName, opt => opt.MapFrom(src => src.CreatedByUser != null ? $"{src.CreatedByUser.FirstName} {src.CreatedByUser.LastName}" : null));
+            CreateMap<Project, ProjectSummaryDto>()
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category != null ? src.Category.Name : null));
+            CreateMap<CreateProjectDto, Project>();
+            CreateMap<UpdateProjectDto, Project>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedBy, opt => opt.Ignore());
+                // .ForMember(dest => dest.DeletedAt, opt => opt.Ignore());  // Temporarily disabled
         }
     }
 }
