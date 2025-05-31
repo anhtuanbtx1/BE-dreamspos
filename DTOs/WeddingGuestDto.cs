@@ -4,7 +4,7 @@ namespace PosStore.DTOs
 {
     public class WeddingGuestDto
     {
-        public Guid Id { get; set; }
+        public long Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string? Unit { get; set; }
         public int NumberOfPeople { get; set; }
@@ -105,7 +105,7 @@ namespace PosStore.DTOs
 
     public class WeddingGuestSummaryDto
     {
-        public Guid Id { get; set; }
+        public long Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string? Unit { get; set; }
         public int NumberOfPeople { get; set; }

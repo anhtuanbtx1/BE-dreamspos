@@ -39,7 +39,7 @@ namespace PosStore.Controllers
         /// Get wedding guest by ID
         /// </summary>
         [HttpGet("{id}")]
-        public async Task<ActionResult<WeddingGuestDto>> GetWeddingGuest(Guid id)
+        public async Task<ActionResult<WeddingGuestDto>> GetWeddingGuest(long id)
         {
             var guest = await _weddingGuestService.GetWeddingGuestByIdAsync(id);
 
@@ -65,7 +65,7 @@ namespace PosStore.Controllers
         /// Update an existing wedding guest
         /// </summary>
         [HttpPut("{id}")]
-        public async Task<ActionResult<WeddingGuestDto>> UpdateWeddingGuest(Guid id, UpdateWeddingGuestDto dto)
+        public async Task<ActionResult<WeddingGuestDto>> UpdateWeddingGuest(long id, UpdateWeddingGuestDto dto)
         {
             var guest = await _weddingGuestService.UpdateWeddingGuestAsync(id, dto);
 
@@ -81,7 +81,7 @@ namespace PosStore.Controllers
         /// Delete a wedding guest (soft delete)
         /// </summary>
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteWeddingGuest(Guid id)
+        public async Task<ActionResult> DeleteWeddingGuest(long id)
         {
             var result = await _weddingGuestService.DeleteWeddingGuestAsync(id);
 
@@ -192,7 +192,7 @@ namespace PosStore.Controllers
         /// Confirm a wedding guest
         /// </summary>
         [HttpPost("{id}/confirm")]
-        public async Task<ActionResult> ConfirmGuest(Guid id)
+        public async Task<ActionResult> ConfirmGuest(long id)
         {
             var result = await _weddingGuestService.ConfirmGuestAsync(id);
 
@@ -208,7 +208,7 @@ namespace PosStore.Controllers
         /// Decline a wedding guest
         /// </summary>
         [HttpPost("{id}/decline")]
-        public async Task<ActionResult> DeclineGuest(Guid id)
+        public async Task<ActionResult> DeclineGuest(long id)
         {
             var result = await _weddingGuestService.DeclineGuestAsync(id);
 

@@ -4,7 +4,7 @@ namespace PosStore.Models
 {
     public class WeddingGuest
     {
-        public Guid Id { get; set; }
+        public long Id { get; set; }
         
         [Required]
         [StringLength(255)]

@@ -122,7 +122,7 @@ namespace PosStore.Services.Service
             };
         }
 
-        public async Task<WeddingGuestDto?> GetWeddingGuestByIdAsync(Guid id)
+        public async Task<WeddingGuestDto?> GetWeddingGuestByIdAsync(long id)
         {
             var guest = await _context.WeddingGuests
                 .FirstOrDefaultAsync(g => g.Id == id && g.IsActive);
@@ -133,7 +133,6 @@ namespace PosStore.Services.Service
         public async Task<WeddingGuestDto> CreateWeddingGuestAsync(CreateWeddingGuestDto createDto)
         {
             var guest = _mapper.Map<WeddingGuest>(createDto);
-            guest.Id = Guid.NewGuid();
             guest.CreatedDate = DateTime.UtcNow;
             guest.UpdatedDate = DateTime.UtcNow;
 
@@ -143,7 +142,7 @@ namespace PosStore.Services.Service
             return _mapper.Map<WeddingGuestDto>(guest);
         }
 
-        public async Task<WeddingGuestDto?> UpdateWeddingGuestAsync(Guid id, UpdateWeddingGuestDto updateDto)
+        public async Task<WeddingGuestDto?> UpdateWeddingGuestAsync(long id, UpdateWeddingGuestDto updateDto)   
         {
             var guest = await _context.WeddingGuests.FindAsync(id);
             if (guest == null || !guest.IsActive)
@@ -156,7 +155,7 @@ namespace PosStore.Services.Service
             return _mapper.Map<WeddingGuestDto>(guest);
         }
 
-        public async Task<bool> DeleteWeddingGuestAsync(Guid id)
+        public async Task<bool> DeleteWeddingGuestAsync(long id)
         {
             var guest = await _context.WeddingGuests.FindAsync(id);
             if (guest == null)
@@ -228,7 +227,7 @@ namespace PosStore.Services.Service
             return _mapper.Map<IEnumerable<WeddingGuestSummaryDto>>(guests);
         }
 
-        public async Task<bool> ConfirmGuestAsync(Guid id)
+        public async Task<bool> ConfirmGuestAsync(long id)
         {
             var guest = await _context.WeddingGuests.FindAsync(id);
             if (guest == null || !guest.IsActive)
@@ -241,7 +240,7 @@ namespace PosStore.Services.Service
             return true;
         }
 
-        public async Task<bool> DeclineGuestAsync(Guid id)
+        public async Task<bool> DeclineGuestAsync(long id)
         {
             var guest = await _context.WeddingGuests.FindAsync(id);
             if (guest == null || !guest.IsActive)
