@@ -20,6 +20,7 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 // Services
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
+builder.Services.AddScoped<IWeddingGuestService, WeddingGuestService>();
 
 
 // JWT Authentication

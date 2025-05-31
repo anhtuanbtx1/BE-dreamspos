@@ -56,6 +56,30 @@ namespace PosStore.Mappings
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedBy, opt => opt.Ignore());
                 // .ForMember(dest => dest.DeletedAt, opt => opt.Ignore());  // Temporarily disabled
+
+            // WeddingGuest mappings
+            CreateMap<WeddingGuest, WeddingGuestDto>()
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
+                .ForMember(dest => dest.Relationship, opt => opt.MapFrom(src => src.Relationship.HasValue ? src.Relationship.Value.ToString() : null));
+            CreateMap<WeddingGuest, WeddingGuestSummaryDto>()
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
+                .ForMember(dest => dest.Relationship, opt => opt.MapFrom(src => src.Relationship.HasValue ? src.Relationship.Value.ToString() : null));
+            CreateMap<CreateWeddingGuestDto, WeddingGuest>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => Enum.Parse<GuestStatus>(src.Status, true)))
+                .ForMember(dest => dest.Relationship, opt => opt.MapFrom(src => !string.IsNullOrEmpty(src.Relationship) ? Enum.Parse<RelationshipType>(src.Relationship, true) : (RelationshipType?)null))
+                .ForMember(dest => dest.CreatedDate, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedDate, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedBy, opt => opt.Ignore())
+                .ForMember(dest => dest.IsActive, opt => opt.Ignore());
+            CreateMap<UpdateWeddingGuestDto, WeddingGuest>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => Enum.Parse<GuestStatus>(src.Status, true)))
+                .ForMember(dest => dest.Relationship, opt => opt.MapFrom(src => !string.IsNullOrEmpty(src.Relationship) ? Enum.Parse<RelationshipType>(src.Relationship, true) : (RelationshipType?)null))
+                .ForMember(dest => dest.CreatedDate, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedBy, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedDate, opt => opt.Ignore())
+                .ForMember(dest => dest.IsActive, opt => opt.Ignore());
         }
     }
 }

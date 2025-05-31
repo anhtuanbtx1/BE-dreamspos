@@ -18,6 +18,7 @@ namespace PosStore.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<ProjectCategory> ProjectCategories { get; set; }
+        public DbSet<WeddingGuest> WeddingGuests { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -85,6 +86,14 @@ namespace PosStore.Data
                     .WithMany()
                     .HasForeignKey(e => e.CreatedBy)
                     .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // WeddingGuest configuration
+            modelBuilder.Entity<WeddingGuest>(entity =>
+            {
+                entity.Property(e => e.GiftAmount).HasPrecision(18, 2);
+                entity.Property(e => e.Status).HasConversion<string>();
+                entity.Property(e => e.Relationship).HasConversion<string>();
             });
 
             // Seed data based on productlistdata.js
