@@ -35,7 +35,7 @@ namespace PosStore.DTOs
         public decimal Budget { get; set; }
         public decimal ActualCost { get; set; } = 0.00m;
         public byte ProgressPercentage { get; set; } = 0;
-        public long CreatedBy { get; set; }
+        public long? CreatedBy { get; set; }
     }
 
     public class UpdateProjectDto

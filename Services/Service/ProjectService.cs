@@ -136,20 +136,76 @@ namespace PosStore.Services.Service
 
         public async Task<ProjectDto> CreateProjectAsync(CreateProjectDto createProjectDto)
         {
-            var project = _mapper.Map<Project>(createProjectDto);
-            project.CreatedAt = DateTime.UtcNow;
-            project.UpdatedAt = DateTime.UtcNow;
+            try {
+                var project = _mapper.Map<Project>(createProjectDto);
+                project.CreatedAt = DateTime.UtcNow;
+                project.UpdatedAt = DateTime.UtcNow;
 
-            _context.Projects.Add(project);
-            await _context.SaveChangesAsync();
+                // Validate and fix Priority
+                var validPriorities = new[] { "low", "medium", "high" };
+                if (!validPriorities.Contains(project.Priority.ToLower()))
+                {
+                    project.Priority = "medium"; // Default to medium
+                }
 
-            // Reload with includes for proper mapping
-            var createdProject = await _context.Projects
-                .Include(p => p.Category)
-                // .Include(p => p.CreatedByUser)
-                .FirstOrDefaultAsync(p => p.Id == project.Id);
+                // Validate CategoryId
+                var categoryExists = await _context.ProjectCategories.AnyAsync(c => c.Id == project.CategoryId);
+                if (!categoryExists)
+                {
+                    // Set to first available category or create default
+                    var firstCategory = await _context.ProjectCategories.FirstOrDefaultAsync();
+                    if (firstCategory != null)
+                    {
+                        project.CategoryId = firstCategory.Id;
+                    }
+                    else
+                    {
+                        // Create default category if none exists
+                        var defaultCategory = new ProjectCategory
+                        {
+                            Name = "General",
+                            Description = "Default category"
+                        };
+                        _context.ProjectCategories.Add(defaultCategory);
+                        await _context.SaveChangesAsync();
+                        project.CategoryId = defaultCategory.Id;
+                    }
+                }
 
-            return _mapper.Map<ProjectDto>(createdProject);
+                // Validate CreatedBy if provided
+                if (createProjectDto.CreatedBy.HasValue)
+                {
+                    var userExists = await _context.Users.AnyAsync(u => u.Id == createProjectDto.CreatedBy.Value);
+                    if (!userExists)
+                    {
+                        // Set to first available user or default to 1
+                        var firstUser = await _context.Users.FirstOrDefaultAsync();
+                        project.CreatedBy = firstUser?.Id ?? 1; // Default to user ID 1 if no users exist
+                    }
+                }
+                else
+                {
+                    // If CreatedBy not provided, set to first available user or default to 1
+                    var firstUser = await _context.Users.FirstOrDefaultAsync();
+                    project.CreatedBy = firstUser?.Id ?? 1; // Default to user ID 1 if no users exist
+                }
+
+                _context.Projects.Add(project);
+                await _context.SaveChangesAsync();
+                // Reload with includes for proper mapping
+                var createdProject = await _context.Projects
+                    .Include(p => p.Category)
+                    // .Include(p => p.CreatedByUser)
+                    .FirstOrDefaultAsync(p => p.Id == project.Id);
+                return _mapper.Map<ProjectDto>(createdProject);
+            }
+            catch (Exception ex)
+            {
+                var a = ex.Message;
+                throw; // Re-throw to see the actual error
+            }
+
+            return null;
         }
 
         public async Task<ProjectDto?> UpdateProjectAsync(long id, UpdateProjectDto updateProjectDto)
