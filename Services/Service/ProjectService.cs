@@ -143,7 +143,7 @@ namespace PosStore.Services.Service
 
                 // Validate and fix Priority
                 var validPriorities = new[] { "low", "medium", "high" };
-                if (!validPriorities.Contains(project.Priority.ToLower()))
+                if (string.IsNullOrEmpty(project.Priority) || !validPriorities.Contains(project.Priority.ToLower()))
                 {
                     project.Priority = "medium"; // Default to medium
                 }
